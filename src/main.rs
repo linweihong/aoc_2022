@@ -126,16 +126,30 @@ fn aoc_3() {
     let contents: String = fs::read_to_string(INPUT_3_1).expect("File access error.");
     // println!("contents: {contents}");
 
+    let mut backpacks = Vec::<&str>::new();
+
     let mut scores = 0;
 
+    // Consolidate backpacks into a vector
     for backpack in contents.split("\n") {
         // println!("backpack: {backpack}");
-        if backpack != "\n" {
-            scores += score(&backpack[..]);
-        }
+        backpacks.push(backpack);
     }
 
+    for backpack in &backpacks[..] {
+        scores += score(&backpack[..]);
+    }
     println!("3_1: {scores}");
+
+    // Calculate score for AOC2022 3_2
+    scores = 0;
+    let mut i = 0;
+    while i < (&backpacks[..].len() - 1) {
+        scores += score_2(backpacks[i], backpacks[i + 1], backpacks[i + 2]);
+        i += 3;
+    }
+    println!("3_2: {scores}");
+    // First attempt: 382 - too low
 
     fn score(backpack: &str) -> i32 {
         let compartment_size = backpack.len() / 2;
@@ -153,7 +167,34 @@ fn aoc_3() {
                 }
             }
         }
-        let points = match duplicate_item {
+        let duplicate_item_points = points(duplicate_item);
+        if duplicate_item_points == 0 {
+            println!("Error in backpack duplicate item.");
+            println!("duplicate item: {duplicate_item}");
+        };
+        // println!("duplicate item: {duplicate_item}");
+        // println!("points: {points}");
+        return duplicate_item_points;
+    }
+
+    fn score_2(backpack_1: &str, backpack_2: &str, backpack_3: &str) -> i32 {
+        for c in backpack_1.chars() {
+            for d in backpack_2.chars() {
+                if c == d {
+                    for e in backpack_3.chars() {
+                        if c == e {
+                            return points(c);
+                        }
+                    }
+                }
+            }
+        }
+        println!("2_1 scoring error: no duplicate item found");
+        return -1; // Error value
+    }
+
+    fn points(item: char) -> i32 {
+        match item {
             'a' => 1,
             'b' => 2,
             'c' => 3,
@@ -207,13 +248,6 @@ fn aoc_3() {
             'Y' => 51,
             'Z' => 52,
             _ => 0,
-        };
-        if points == 0 {
-            println!("Error in backpack duplicate item.");
-            println!("duplicate item: {duplicate_item}");
-        };
-        // println!("duplicate item: {duplicate_item}");
-        // println!("points: {points}");
-        return points;
+        }
     }
 }
