@@ -1,11 +1,13 @@
-use std::fs;
+use std::{fs, panic};
 
 const INPUT_1_1: &str = "./inputs/1_1.txt";
 const INPUT_2_1: &str = "./inputs/2_1.txt";
+const INPUT_3_1: &str = "./inputs/3_1.txt";
 
 fn main() {
-    aoc_1();
-    aoc_2();
+    // aoc_1();
+    // aoc_2();
+    aoc_3();
 }
 
 fn aoc_1() {
@@ -117,5 +119,101 @@ fn aoc_2() {
             }
         }
         return (score_1, score_2);
+    }
+}
+
+fn aoc_3() {
+    let contents: String = fs::read_to_string(INPUT_3_1).expect("File access error.");
+    // println!("contents: {contents}");
+
+    let mut scores = 0;
+
+    for backpack in contents.split("\n") {
+        // println!("backpack: {backpack}");
+        if backpack != "\n" {
+            scores += score(&backpack[..]);
+        }
+    }
+
+    println!("3_1: {scores}");
+
+    fn score(backpack: &str) -> i32 {
+        let compartment_size = backpack.len() / 2;
+        let compartment_1 = &backpack[..compartment_size];
+        let compartment_2 = &backpack[compartment_size..];
+        // println!("backpack: {backpack}");
+        // println!("compartment 1: {compartment_1}");
+        // println!("compartment 2: {compartment_2}");
+        let mut duplicate_item = ' ';
+        'comparison_loop: for item in compartment_1.chars() {
+            for item_2 in compartment_2.chars() {
+                if item == item_2 {
+                    duplicate_item = item;
+                    break 'comparison_loop;
+                }
+            }
+        }
+        let points = match duplicate_item {
+            'a' => 1,
+            'b' => 2,
+            'c' => 3,
+            'd' => 4,
+            'e' => 5,
+            'f' => 6,
+            'g' => 7,
+            'h' => 8,
+            'i' => 9,
+            'j' => 10,
+            'k' => 11,
+            'l' => 12,
+            'm' => 13,
+            'n' => 14,
+            'o' => 15,
+            'p' => 16,
+            'q' => 17,
+            'r' => 18,
+            's' => 19,
+            't' => 20,
+            'u' => 21,
+            'v' => 22,
+            'w' => 23,
+            'x' => 24,
+            'y' => 25,
+            'z' => 26,
+            'A' => 27,
+            'B' => 28,
+            'C' => 29,
+            'D' => 30,
+            'E' => 31,
+            'F' => 32,
+            'G' => 33,
+            'H' => 34,
+            'I' => 35,
+            'J' => 36,
+            'K' => 37,
+            'L' => 38,
+            'M' => 39,
+            'N' => 40,
+            'O' => 41,
+            'P' => 42,
+            'Q' => 43,
+            'R' => 44,
+            'S' => 45,
+            'T' => 46,
+            'U' => 47,
+            'V' => 48,
+            'W' => 49,
+            'X' => 50,
+            'Y' => 51,
+            'Z' => 52,
+            _ => 0,
+        };
+        if points == 0 {
+            println!("Error in backpack duplicate item.");
+            println!("duplicate item: {duplicate_item}");
+        };
+        // println!("duplicate item: {duplicate_item}");
+        // println!("points: {points}");
+        return points;
     }
 }
