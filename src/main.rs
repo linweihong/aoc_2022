@@ -403,11 +403,16 @@ fn aoc_5() {
             // println!("{}:{}:{}", moves, source, destination);
             // println!("{stacks:?}");
             // println!("source: {source}, destination: {destination}, moves: {moves}");
-            for _ in 0..moves {
-                stack_height = stacks[source].len();
-                // println!("stack height: {stack_height}");
-                let tail = stacks[source].split_off(stack_height - 1);
-                stacks[destination].push(tail[0])
+            // for _ in 0..moves {
+            //     stack_height = stacks[source].len();
+            //     // println!("stack height: {stack_height}");
+            //     let tail = stacks[source].split_off(stack_height - 1);
+            //     stacks[destination].push(tail[0])
+            // }
+            stack_height = stacks[source].len();
+            let tail = stacks[source].split_off(stack_height - moves);
+            for element in &tail {
+                stacks[destination].push(*element);
             }
         }
     }
@@ -418,7 +423,7 @@ fn aoc_5() {
         stack_height = stack.len();
         top_crates.push(stack[stack_height - 1]);
     }
-    println!("5_1: {top_crates:?}");
+    println!("5_2: {top_crates:?}");
 
     fn process(line: &str) -> (usize, usize, usize) {
         let mut moves: usize = 0;
