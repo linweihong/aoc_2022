@@ -1,13 +1,15 @@
-use std::{fs, panic};
+use std::fs;
 
 const INPUT_1_1: &str = "./inputs/1_1.txt";
 const INPUT_2_1: &str = "./inputs/2_1.txt";
 const INPUT_3_1: &str = "./inputs/3_1.txt";
+const INPUT_4_1: &str = "./inputs/4_1.txt";
 
 fn main() {
     // aoc_1();
     // aoc_2();
-    aoc_3();
+    // aoc_3();
+    aoc_4();
 }
 
 fn aoc_1() {
@@ -248,6 +250,73 @@ fn aoc_3() {
             'Y' => 51,
             'Z' => 52,
             _ => 0,
+        }
+    }
+}
+
+fn aoc_4() {
+    let contents: String = fs::read_to_string(INPUT_4_1).expect("File access error");
+
+    // Create vector of assignments
+    let mut assignments = Vec::<&str>::new();
+    for assignment in contents.split("\n") {
+        if assignment != "" {
+            assignments.push(assignment);
+        }
+    }
+    // println!("{assignments:#?}");
+
+    let mut score = 0;
+    let mut assignment_pair = Vec::<&str>::new();
+
+    for assignment in &assignments[..] {
+        for a in assignment.split(",") {
+            assignment_pair.push(a);
+        }
+        // println!("assignment pair: {assignment_pair:#?}");
+        score += compare_assignments(assignment_pair[0], assignment_pair[1]);
+        assignment_pair.clear();
+    }
+
+    println!("4_1: {score}");
+
+    fn compare_assignments(assignment_1: &str, assignment_2: &str) -> i32 {
+        let mut assign_1_vec = Vec::<i32>::new();
+        let mut assign_2_vec = Vec::<i32>::new();
+
+        for i in assignment_1.split("-") {
+            let id = match i.parse() {
+                Ok(num) => num,
+                Err(_) => 0,
+            };
+            if id == 0 {
+                println!("ID error");
+            } else {
+                assign_1_vec.push(id);
+            }
+        }
+
+        for i in assignment_2.split("-") {
+            let id = match i.parse() {
+                Ok(num) => num,
+                Err(_) => 0,
+            };
+            if id == 0 {
+                println!("ID error");
+            } else {
+                assign_2_vec.push(id);
+            }
+        }
+
+        // println!("assignment_1: {assign_1_vec:#?}");
+        // println!("assignment_2: {assign_2_vec:#?}");
+
+        if assign_1_vec[0] >= assign_2_vec[0] && assign_1_vec[1] <= assign_2_vec[1] {
+            return 1;
+        } else if assign_2_vec[0] >= assign_1_vec[0] && assign_2_vec[1] <= assign_1_vec[1] {
+            return 1;
+        } else {
+            return 0;
         }
     }
 }
