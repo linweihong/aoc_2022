@@ -266,21 +266,27 @@ fn aoc_4() {
     }
     // println!("{assignments:#?}");
 
-    let mut score = 0;
+    let mut score_1 = 0;
+    let mut score_2 = 0;
     let mut assignment_pair = Vec::<&str>::new();
+    let mut a_1 = Vec::<i32>::new();
+    let mut a_2 = Vec::<i32>::new();
 
     for assignment in &assignments[..] {
         for a in assignment.split(",") {
             assignment_pair.push(a);
         }
         // println!("assignment pair: {assignment_pair:#?}");
-        score += compare_assignments(assignment_pair[0], assignment_pair[1]);
+        (a_1, a_2) = parse_assignments(assignment_pair[0], assignment_pair[1]);
+        score_1 += scoring_1(&a_1[..], &a_2[..]);
+        score_2 += scoring_2(&a_1[..], &a_2[..]);
         assignment_pair.clear();
     }
 
-    println!("4_1: {score}");
+    println!("4_1: {score_1}");
+    println!("4_2: {score_2}");
 
-    fn compare_assignments(assignment_1: &str, assignment_2: &str) -> i32 {
+    fn parse_assignments(assignment_1: &str, assignment_2: &str) -> (Vec<i32>, Vec<i32>) {
         let mut assign_1_vec = Vec::<i32>::new();
         let mut assign_2_vec = Vec::<i32>::new();
 
@@ -308,12 +314,30 @@ fn aoc_4() {
             }
         }
 
-        // println!("assignment_1: {assign_1_vec:#?}");
-        // println!("assignment_2: {assign_2_vec:#?}");
+        return (assign_1_vec, assign_2_vec);
+    }
+    // println!("assignment_1: {assign_1_vec:#?}");
+    // println!("assignment_2: {assign_2_vec:#?}");
 
+    fn scoring_1(assign_1_vec: &[i32], assign_2_vec: &[i32]) -> i32 {
         if assign_1_vec[0] >= assign_2_vec[0] && assign_1_vec[1] <= assign_2_vec[1] {
             return 1;
         } else if assign_2_vec[0] >= assign_1_vec[0] && assign_2_vec[1] <= assign_1_vec[1] {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    fn scoring_2(a_1: &[i32], a_2: &[i32]) -> i32 {
+        // println!("scoring 2: {a_1:?}, {a_2:?}");
+        if a_1[0] >= a_2[0] && a_1[0] <= a_2[1] {
+            return 1;
+        } else if a_1[1] >= a_2[0] && a_1[1] <= a_2[1] {
+            return 1;
+        } else if a_2[0] >= a_1[0] && a_2[0] <= a_1[1] {
+            return 1;
+        } else if a_2[1] >= a_1[0] && a_2[1] <= a_1[1] {
             return 1;
         } else {
             return 0;
