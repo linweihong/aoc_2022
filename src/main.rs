@@ -4,12 +4,14 @@ const INPUT_1_1: &str = "./inputs/1_1.txt";
 const INPUT_2_1: &str = "./inputs/2_1.txt";
 const INPUT_3_1: &str = "./inputs/3_1.txt";
 const INPUT_4_1: &str = "./inputs/4_1.txt";
+const INPUT_5_1: &str = "./inputs/5_1.txt";
 
 fn main() {
-    // aoc_1();
-    // aoc_2();
-    // aoc_3();
+    aoc_1();
+    aoc_2();
+    aoc_3();
     aoc_4();
+    aoc_5();
 }
 
 fn aoc_1() {
@@ -344,3 +346,106 @@ fn aoc_4() {
         }
     }
 }
+
+fn aoc_5() {
+    let contents: String = fs::read_to_string(INPUT_5_1).expect("File access error");
+
+    let mut num_stacks = 0;
+
+    // Extract the number of stacks of crates
+    for line in contents.split("\n") {
+        if line.contains("move") {
+            continue;
+        }
+        if line.contains('1') {
+            for element in line.split(" ") {
+                if element != "" {
+                    num_stacks += 1;
+                }
+            }
+        } else {
+            continue;
+        }
+    }
+
+    // Create vector mapping of crate positions
+    let mut stacks = Vec::<Vec<char>>::new();
+    for _ in 0..num_stacks {
+        stacks.push(vec![]);
+    }
+    // println!("{stacks:?}");
+
+    // Extract crate labels
+    for line in contents.split("\n") {
+        if line.contains("move") {
+            continue;
+        } else if line.contains('1') {
+            continue;
+        } else {
+            for (i, c) in line.chars().enumerate() {
+                if c.is_alphabetic() {
+                    let stack_num = (i - 1) / 4;
+                    stacks[stack_num].push(c);
+                }
+            }
+        }
+    }
+    for stack in &mut stacks {
+        stack.reverse();
+    }
+    // println!("{stacks:?}");
+
+    // Process moves
+    let mut stack_height: usize = 0;
+    for line in contents.split("\n") {
+        if line.contains("move") {
+            let (moves, source, destination) = process(&line[..]);
+            // println!("{}:{}:{}", moves, source, destination);
+            // println!("{stacks:?}");
+            // println!("source: {source}, destination: {destination}, moves: {moves}");
+            for _ in 0..moves {
+                stack_height = stacks[source].len();
+                // println!("stack height: {stack_height}");
+                let tail = stacks[source].split_off(stack_height - 1);
+                stacks[destination].push(tail[0])
+            }
+        }
+    }
+
+    // Final crate position
+    let mut top_crates = Vec::<char>::new();
+    for stack in &stacks {
+        stack_height = stack.len();
+        top_crates.push(stack[stack_height - 1]);
+    }
+    println!("5_1: {top_crates:?}");
+
+    fn process(line: &str) -> (usize, usize, usize) {
+        let mut moves: usize = 0;
+        let mut source: usize = 0;
+        let mut destination: usize = 0;
+        for (i, word) in line.split(" ").enumerate() {
+            if word.parse::<i32>().is_ok() {
+                if i == 1 {
+                    moves = match word.parse() {
+                        Ok(num) => num,
+                        Err(_) => 0,
+                    };
+                } else if i == 3 {
+                    source = match word.parse() {
+                        Ok(num) => num,
+                        Err(_) => 0,
+                    };
+                } else if i == 5 {
+                    destination = match word.parse() {
+                        Ok(num) => num,
+                        Err(_) => 0,
+                    };
+                }
+            }
+        }
+        return (moves, source - 1, destination - 1);
+    }
+}
+
+// println!("number of stacks: {num_stacks}");
