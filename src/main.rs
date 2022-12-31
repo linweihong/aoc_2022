@@ -7,6 +7,7 @@ const INPUT_3_1: &str = "./inputs/3_1.txt";
 const INPUT_4_1: &str = "./inputs/4_1.txt";
 const INPUT_5_1: &str = "./inputs/5_1.txt";
 const INPUT_6_1: &str = "./inputs/6_1.txt";
+const INPUT_7_1: &str = "./inputs/7_1.txt";
 
 fn main() {
     // env::set_var("RUST_BACKTRACE", "1");
@@ -15,7 +16,8 @@ fn main() {
     // aoc_3();
     // aoc_4();
     // aoc_5();
-    aoc_6();
+    // aoc_6();
+    aoc_7();
 }
 
 fn aoc_1() {
@@ -480,4 +482,8 @@ fn aoc_6() {
         }
         false
     }
+}
+
+fn aoc_7() {
+    todo!()
 }
