@@ -1,17 +1,21 @@
-use std::fs;
+use std::collections::VecDeque;
+use std::{env, fs};
 
 const INPUT_1_1: &str = "./inputs/1_1.txt";
 const INPUT_2_1: &str = "./inputs/2_1.txt";
 const INPUT_3_1: &str = "./inputs/3_1.txt";
 const INPUT_4_1: &str = "./inputs/4_1.txt";
 const INPUT_5_1: &str = "./inputs/5_1.txt";
+const INPUT_6_1: &str = "./inputs/6_1.txt";
 
 fn main() {
-    aoc_1();
-    aoc_2();
-    aoc_3();
-    aoc_4();
-    aoc_5();
+    // env::set_var("RUST_BACKTRACE", "1");
+    // aoc_1();
+    // aoc_2();
+    // aoc_3();
+    // aoc_4();
+    // aoc_5();
+    aoc_6();
 }
 
 fn aoc_1() {
@@ -292,7 +296,7 @@ fn aoc_4() {
         let mut assign_1_vec = Vec::<i32>::new();
         let mut assign_2_vec = Vec::<i32>::new();
 
-        for i in assignment_1.split("-") {
+        for i in assignment_1.trim().split("-") {
             let id = match i.parse() {
                 Ok(num) => num,
                 Err(_) => 0,
@@ -304,7 +308,7 @@ fn aoc_4() {
             }
         }
 
-        for i in assignment_2.split("-") {
+        for i in assignment_2.trim().split("-") {
             let id = match i.parse() {
                 Ok(num) => num,
                 Err(_) => 0,
@@ -353,12 +357,12 @@ fn aoc_5() {
     let mut num_stacks = 0;
 
     // Extract the number of stacks of crates
-    for line in contents.split("\n") {
+    for line in contents.trim().split("\n") {
         if line.contains("move") {
             continue;
         }
         if line.contains('1') {
-            for element in line.split(" ") {
+            for element in line.trim().split(" ") {
                 if element != "" {
                     num_stacks += 1;
                 }
@@ -376,7 +380,7 @@ fn aoc_5() {
     // println!("{stacks:?}");
 
     // Extract crate labels
-    for line in contents.split("\n") {
+    for line in contents.trim().split("\n") {
         if line.contains("move") {
             continue;
         } else if line.contains('1') {
@@ -397,7 +401,7 @@ fn aoc_5() {
 
     // Process moves
     let mut stack_height: usize = 0;
-    for line in contents.split("\n") {
+    for line in contents.trim().split("\n") {
         if line.contains("move") {
             let (moves, source, destination) = process(&line[..]);
             // println!("{}:{}:{}", moves, source, destination);
@@ -409,7 +413,8 @@ fn aoc_5() {
             //     let tail = stacks[source].split_off(stack_height - 1);
             //     stacks[destination].push(tail[0])
             // }
-            stack_height = stacks[source].len();
+            stack_height = dbg!(stacks[source].len());
+            dbg!(moves);
             let tail = stacks[source].split_off(stack_height - moves);
             for element in &tail {
                 stacks[destination].push(*element);
@@ -420,7 +425,7 @@ fn aoc_5() {
     // Final crate position
     let mut top_crates = Vec::<char>::new();
     for stack in &stacks {
-        stack_height = stack.len();
+        stack_height = dbg!(stack.len());
         top_crates.push(stack[stack_height - 1]);
     }
     println!("5_2: {top_crates:?}");
@@ -429,7 +434,7 @@ fn aoc_5() {
         let mut moves: usize = 0;
         let mut source: usize = 0;
         let mut destination: usize = 0;
-        for (i, word) in line.split(" ").enumerate() {
+        for (i, word) in line.trim().split(" ").enumerate() {
             if word.parse::<i32>().is_ok() {
                 if i == 1 {
                     moves = match word.parse() {
@@ -453,4 +458,26 @@ fn aoc_5() {
     }
 }
 
-// println!("number of stacks: {num_stacks}");
+fn aoc_6() {
+    let signal: String = fs::read_to_string(INPUT_6_1).expect("File access error.");
+    let marker_length = 14;
+    for i in 0..(signal.len() - marker_length) {
+        let mut marker = Vec::<char>::new();
+        for c in signal[i..i + marker_length].chars() {
+            marker.push(c);
+        }
+        if has_dup(&marker) == false {
+            println!("{}", i + marker_length);
+            break;
+        }
+    }
+
+    fn has_dup(slice: &[char]) -> bool {
+        for i in 1..slice.len() {
+            if slice[i..].contains(&slice[i - 1]) {
+                return true;
+            }
+        }
+        false
+    }
+}
