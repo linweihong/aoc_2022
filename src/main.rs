@@ -1,5 +1,6 @@
 use std::collections::VecDeque;
 use std::{env, fs};
+mod d07;
 
 const INPUT_1_1: &str = "./inputs/1_1.txt";
 const INPUT_2_1: &str = "./inputs/2_1.txt";
@@ -17,7 +18,7 @@ fn main() {
     // aoc_4();
     // aoc_5();
     // aoc_6();
-    aoc_7();
+    d07::create_file_structure();
 }
 
 fn aoc_1() {
@@ -482,8 +483,4 @@ fn aoc_6() {
         }
         false
     }
-}
-
-fn aoc_7() {
-    todo!()
 }
