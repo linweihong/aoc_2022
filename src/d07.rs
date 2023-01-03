@@ -4,23 +4,61 @@ use std::fs;
 const INPUT: &str = "./inputs/7_1.txt";
 
 #[derive(Debug)]
-    struct Database {
+struct Database {
     dir: HashMap<String, Database>,
     size: i32,
 }
 
 impl Database {
-    fn add_contents(&mut self, cwd: &[&str], contents: HashMap<String, Database>, cwd_file_sizes: i32) {
+    fn add_contents(
+        &mut self,
+        cwd: &[&str],
+        contents: HashMap<String, Database>,
+        cwd_file_sizes: i32,
+    ) {
         if cwd.len() > 1 {
-            self.dir.get_mut(cwd[0]).unwrap().add_contents(&cwd[1..], contents, cwd_file_sizes);
+            self.dir
+                .get_mut(cwd[0])
+                .unwrap()
+                .add_contents(&cwd[1..], contents, cwd_file_sizes);
         } else {
             self.dir.get_mut(cwd[0]).unwrap().dir = contents;
             self.dir.get_mut(cwd[0]).unwrap().size = cwd_file_sizes;
         }
     }
+
+    fn get_size(&self) -> i32 {
+        let mut total_size = self.size;
+        for k in self.dir.keys() {
+            total_size += self.dir.get(k).unwrap().get_size(); // FIXME: returning 0 for parent dir
+        }
+        return total_size;
+    }
 }
 
-pub fn create_file_structure() {
+pub fn get_directory_sizes() {
+    let mut directory_sizes = HashMap::<String, i32>::new();
+    let db = create_file_structure();
+    let dir_sizes = iter_dir_sizes(&db);
+    let mut tagged_dir_sizes = 0;
+    for k in dir_sizes.keys() {
+        if dir_sizes[k] <= 100000 {
+            tagged_dir_sizes += dir_sizes[k];
+        }
+    }
+    println!("7_1: {tagged_dir_sizes}"); // FIXME: first attempt - 1163150 - too low
+}
+
+fn iter_dir_sizes(db: &Database) -> HashMap<String, i32> {
+    let mut sizes = HashMap::<String, i32>::new();
+    for k in db.dir.keys() {
+        sizes.insert(k.to_string(), db.dir[k].get_size());
+        sizes.extend(iter_dir_sizes(&db.dir[k]))
+    }
+    return sizes;
+}
+
+fn create_file_structure() -> Database {
     let inputs = fs::read_to_string(INPUT).expect("File access error");
     let commands: Vec<_> = inputs.split("\n").collect();
     let mut db = Database {
@@ -54,7 +92,7 @@ pub fn create_file_structure() {
             i += skip_index;
         }
     }
-    dbg!(db);
+    return db;
 }
 
 fn ls(cmds: &Vec<&str>, i: usize) -> (HashMap<String, Database>, i32, usize) {
@@ -86,6 +124,3 @@ fn ls(cmds: &Vec<&str>, i: usize) -> (HashMap<String, Database>, i32, usize) {
     }
     return (contents, cwd_file_sizes, skip_index);
 }
-
-// todo: implement filesize parsing
-// todo: implement recursive function for calculating directory size
