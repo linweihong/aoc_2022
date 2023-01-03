@@ -18,7 +18,7 @@ fn main() {
     // aoc_4();
     // aoc_5();
     // aoc_6();
-    d07::create_file_structure();
+    d07::get_directory_sizes();
 }
 
 fn aoc_1() {
