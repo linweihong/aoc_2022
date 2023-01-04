@@ -6,6 +6,7 @@ const INPUT: &str = "./inputs/7_1.txt";
 #[derive(Debug)]
 struct Database {
     dir: HashMap<String, Database>,
+    current_dir: String,
     size: i32,
 }
 
@@ -30,16 +31,17 @@ impl Database {
     fn get_size(&self) -> i32 {
         let mut total_size = self.size;
         for k in self.dir.keys() {
-            total_size += self.dir.get(k).unwrap().get_size(); // FIXME: returning 0 for parent dir
+            total_size += self.dir[k].get_size(); // FIXME: returning 0 for parent dir
         }
         return total_size;
     }
 }
 
 pub fn get_directory_sizes() {
-    let mut directory_sizes = HashMap::<String, i32>::new();
     let db = create_file_structure();
+    // dbg!(&db);
     let dir_sizes = iter_dir_sizes(&db);
+    dbg!(&dir_sizes.len());
     let mut tagged_dir_sizes = 0;
     for k in dir_sizes.keys() {
         if dir_sizes[k] <= 100000 {
@@ -50,12 +52,12 @@ pub fn get_directory_sizes() {
 }
 
 fn iter_dir_sizes(db: &Database) -> HashMap<String, i32> {
-    let mut sizes = HashMap::<String, i32>::new();
+    let mut dir_sizes = HashMap::<String, i32>::new();
     for k in db.dir.keys() {
-        sizes.insert(k.to_string(), db.dir[k].get_size());
-        sizes.extend(iter_dir_sizes(&db.dir[k]))
+        dir_sizes.insert(db.dir[k].current_dir.to_string(), db.dir[k].get_size());
+        dir_sizes.extend(iter_dir_sizes(&db.dir[k]));
     }
-    return sizes;
+    return dir_sizes;
 }
 
 fn create_file_structure() -> Database {
@@ -66,9 +68,11 @@ fn create_file_structure() -> Database {
             "/".to_string(),
             Database {
                 dir: HashMap::new(),
+                current_dir: ".//".to_string(),
                 size: 0,
             },
         )]),
+        current_dir: ".".to_string(),
         size: 0,
     };
     let mut current_working_directory = Vec::<&str>::new();
@@ -87,7 +91,7 @@ fn create_file_structure() -> Database {
                 i += 1;
             }
         } else if command[1] == "ls" {
-            let (contents, file_sizes, skip_index) = ls(&commands, i);
+            let (contents, file_sizes, skip_index) = ls(&commands, i, &current_working_directory);
             db.add_contents(&current_working_directory, contents, file_sizes);
             i += skip_index;
         }
@@ -95,24 +99,27 @@ fn create_file_structure() -> Database {
     return db;
 }
 
-fn ls(cmds: &Vec<&str>, i: usize) -> (HashMap<String, Database>, i32, usize) {
+fn ls(cmds: &Vec<&str>, i: usize, cwd: &Vec<&str>) -> (HashMap<String, Database>, i32, usize) {
     let mut skip_index = 1;
     let mut contents = HashMap::<String, Database>::new();
     let mut cwd_file_sizes = 0;
     while i + skip_index < cmds.len() {
         let cmd_raw = cmds[i + skip_index].trim();
         let cmd: Vec<_> = cmd_raw.split(" ").collect();
-        if cmd[0] == "dir" {
+        let cwd_str = cwd.join("/");
+        if cmd[0] == "$" {
+            return (contents, cwd_file_sizes, skip_index);
+        } else if cmd[0] == "dir" {
+            let new_subdir = format!("./{}/{}", cwd_str, cmd[1]);
             contents.insert(
                 cmd[1].to_string(),
                 Database {
                     dir: HashMap::new(),
+                    current_dir: new_subdir,
                     size: 0,
                 },
             );
             skip_index += 1;
-        } else if cmd[0] == "$" {
-            return (contents, cwd_file_sizes, skip_index);
         } else {
             let size: i32 = match cmd[0].parse() {
                 Ok(int) => int,
