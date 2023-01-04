@@ -2,6 +2,8 @@ use std::collections::HashMap;
 use std::fs;
 
 const INPUT: &str = "./inputs/7_1.txt";
+const TOTAL_SPACE: i32 = 70000000;
+const REQUIRED_SPACE: i32 = 30000000;
 
 #[derive(Debug)]
 struct Database {
@@ -31,24 +33,40 @@ impl Database {
     fn get_size(&self) -> i32 {
         let mut total_size = self.size;
         for k in self.dir.keys() {
-            total_size += self.dir[k].get_size(); // FIXME: returning 0 for parent dir
+            total_size += self.dir[k].get_size();
         }
         return total_size;
     }
 }
 
-pub fn get_directory_sizes() {
+pub fn solve() {
+    let dir_sizes = get_directory_sizes();
+    let used_space = dir_sizes[".//"];
+    let space_difference = REQUIRED_SPACE - (TOTAL_SPACE - used_space);
+    let mut smallest_dir_size = TOTAL_SPACE;
+    let mut smallest_dir_name = &String::new();
+    for dir in dir_sizes.keys() {
+        if dir_sizes[dir] >= space_difference && dir_sizes[dir] < smallest_dir_size {
+            smallest_dir_size = dir_sizes[dir];
+            smallest_dir_name = dir;
+        }
+    }
+    println!("7_2: {smallest_dir_size}");
+}
+
+ fn get_directory_sizes() -> HashMap<String, i32> {
     let db = create_file_structure();
     // dbg!(&db);
     let dir_sizes = iter_dir_sizes(&db);
-    dbg!(&dir_sizes.len());
+    // dbg!(&dir_sizes.len());
     let mut tagged_dir_sizes = 0;
     for k in dir_sizes.keys() {
         if dir_sizes[k] <= 100000 {
             tagged_dir_sizes += dir_sizes[k];
         }
     }
-    println!("7_1: {tagged_dir_sizes}"); // FIXME: first attempt - 1163150 - too low
+    println!("7_1: {tagged_dir_sizes}");
+    return dir_sizes; // first attempt - 1163150 - too low
 }
 
 fn iter_dir_sizes(db: &Database) -> HashMap<String, i32> {
@@ -79,7 +97,6 @@ fn create_file_structure() -> Database {
     let commands_len = commands.len();
     let mut i = 0;
     while i < commands_len {
-        // todo: implement command parsing
         let command_raw = commands[i].trim();
         let command: Vec<_> = command_raw.split(" ").collect();
         if command[1] == "cd" {
