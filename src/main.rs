@@ -2,6 +2,7 @@ use std::collections::VecDeque;
 use std::{env, fs};
 mod d07;
 mod d08;
+mod d09;
 
 const INPUT_1_1: &str = "./inputs/1_1.txt";
 const INPUT_2_1: &str = "./inputs/2_1.txt";
@@ -20,6 +21,7 @@ fn main() {
     // aoc_6();
     d07::solve();
     d08::solve();
+    d09::solve();
 }
 
 fn aoc_1() {
