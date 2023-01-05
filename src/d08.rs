@@ -3,11 +3,11 @@ use aoc_2022::get_input;
 const INPUT: &str = "./inputs/8_1.txt";
 
 pub fn solve() {
-    let grid = &create_grid();
+    let grid = create_grid();
     // dbg!(&grid);
     let visible_trees = get_visible_trees(&grid);
-    println!("8_1: {visible_trees}"); // first attempt - 392 too low; second attempt - 1556 too low
-                                      // FIXME: troubleshoot
+    println!("8_1: {visible_trees}");
+    tree_scores(&grid);
 }
 
 fn create_grid() -> Vec<Vec<u32>> {
@@ -78,4 +78,58 @@ fn count_visible_trees(grid: &[Vec<u32>], row: usize) -> u32 {
         }
     }
     return row_visible_trees;
+}
+
+fn tree_scores(grid: &[Vec<u32>]) {
+    let mut max_tree_score: u32 = 0;
+    for row in 0..grid.len() {
+        for col in 0..grid[row].len() {
+            let tree_score = get_tree_score(&grid, row, col);
+            if tree_score > max_tree_score {
+                max_tree_score = tree_score;
+            }
+        }
+    }
+    println!("8_2: {max_tree_score}");
+}
+
+fn get_tree_score(grid: &[Vec<u32>], row: usize, col: usize) -> u32 {
+    let mut score_north = 0;
+    let mut score_south = 0;
+    let mut score_east = 0;
+    let mut score_west = 0;
+    let h = grid[row][col];
+    if col > 0 {
+        for i in (0..col).rev() {
+            score_west += 1;
+            if grid[row][i] >= h {
+                break;
+            }
+        }
+    }
+    if col < (grid[row].len() - 1) {
+        for i in (col + 1)..grid[row].len() {
+            score_east += 1;
+            if grid[row][i] >= h {
+                break;
+            }
+        }
+    }
+    if row > 0 {
+        for i in (0..row).rev() {
+            score_north += 1;
+            if grid[i][col] >= h {
+                break;
+            }
+        }
+    }
+    if row < (grid.len() - 1) {
+        for i in (row + 1)..grid.len() {
+            score_south += 1;
+            if grid[i][col] >= h {
+                break;
+            }
+        }
+    }
+    return score_north * score_south * score_east * score_west;
 }
