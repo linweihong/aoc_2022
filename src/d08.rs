@@ -3,7 +3,7 @@ use aoc_2022::get_input;
 const INPUT: &str = "./inputs/8_1.txt";
 
 pub fn solve() {
-    let grid = create_grid();
+    let grid = &create_grid();
     // dbg!(&grid);
     let visible_trees = get_visible_trees(&grid);
     println!("8_1: {visible_trees}"); // first attempt - 392 too low; second attempt - 1556 too low
@@ -52,21 +52,25 @@ fn count_visible_trees(grid: &[Vec<u32>], row: usize) -> u32 {
         for j in 0..i {
             if grid[row][j] >= h {
                 flag_west = false;
+                break;
             }
         }
-        for j in i + 1..grid[row].len() {
+        for j in (i + 1)..grid[row].len() {
             if grid[row][j] >= h {
                 flag_east = false;
+                break;
             }
         }
         for j in 0..row {
             if grid[j][i] >= h {
                 flag_north = false;
+                break;
             }
         }
-        for j in row..grid.len() {
+        for j in (row + 1)..grid.len() {
             if grid[j][i] >= h {
                 flag_south = false;
+                break;
             }
         }
         if flag_north == true || flag_south == true || flag_east == true || flag_west == true {
