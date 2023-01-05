@@ -2,7 +2,7 @@ use aoc_2022::get_input;
 
 const INPUT: &str = "./inputs/9_1.txt";
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 struct Point {
     x: i32,
     y: i32,
@@ -105,7 +105,7 @@ pub fn solve() {
     let mut pointlist = vec![(0, 0)];
     let mut head = Point { x: 0, y: 0 };
     let mut tail = Point { x: 0, y: 0 };
-    for s in steps {
+    for s in &steps {
         for _ in 0..s.steps {
             head.step(&s.direction);
             tail.update(&head);
@@ -115,6 +115,24 @@ pub fn solve() {
     pointlist.sort();
     pointlist.dedup();
     println!("9_1: {}", pointlist.len());
+    let mut pointlist = vec![(0, 0)];
+    let mut rope = Vec::<Point>::new();
+    for _ in 0..10 {
+        rope.push(Point { x: 0, y: 0 });
+    }
+    for s in &steps {
+        for _ in 0..s.steps {
+            rope[0].step(&s.direction);
+            for i in 1..rope.len() {
+                let leading_segment = rope[i - 1].to_owned();
+                rope[i].update(&leading_segment);
+                pointlist.push(rope[rope.len() - 1].report());
+            }
+        }
+    }
+    pointlist.sort();
+    pointlist.dedup();
+    println!("9_2: {}", pointlist.len());
 }
 
 fn get_moves() -> Vec<Step> {
