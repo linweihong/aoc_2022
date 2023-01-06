@@ -3,6 +3,7 @@ use std::{env, fs};
 mod d07;
 mod d08;
 mod d09;
+mod d10;
 
 const INPUT_1_1: &str = "./inputs/1_1.txt";
 const INPUT_2_1: &str = "./inputs/2_1.txt";
@@ -22,6 +23,7 @@ fn main() {
     d07::solve();
     d08::solve();
     d09::solve();
+    d10::solve();
 }
 
 fn aoc_1() {
