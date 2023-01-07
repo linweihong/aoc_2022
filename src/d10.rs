@@ -31,7 +31,7 @@ impl Clock {
 pub fn solve() {
     let mut clock = Clock {
         cycles: vec![0],
-        signal: 0,
+        signal: 1,
     };
     let instructions = get_cycles();
     for instruction in &instructions {
@@ -51,6 +51,8 @@ pub fn solve() {
         + clock.strength(220);
 
     println!("10_1: {ans}"); // first attempt - 14140 - too low
+                             // second attempt - 13140 - used wrong input
+                             // third attempt - 14860 - correct
 }
 
 fn get_cycles() -> Vec<String> {
