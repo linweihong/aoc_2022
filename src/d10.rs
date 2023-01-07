@@ -1,4 +1,4 @@
-use aoc_2022::get_input;
+use aoc_2022::{divmod, get_input};
 
 const INPUT: &str = "./inputs/10_1.txt";
 
@@ -53,6 +53,27 @@ pub fn solve() {
     println!("10_1: {ans}"); // first attempt - 14140 - too low
                              // second attempt - 13140 - used wrong input
                              // third attempt - 14860 - correct
+
+    let mut registers = Vec::<Vec<String>>::new();
+    for _ in 0..6 {
+        registers.push(Vec::<String>::new());
+    }
+    for crt_cycle in 0..240 {
+        let sprite = vec![
+            clock.cycles[crt_cycle as usize] - 1,
+            clock.cycles[crt_cycle as usize],
+            clock.cycles[crt_cycle as usize] + 1,
+        ];
+        let row = crt_cycle / 40;
+        if sprite.contains(&(crt_cycle % 40)) {
+            registers[row as usize].push("#".to_string());
+        } else {
+            registers[row as usize].push(".".to_string());
+        }
+    }
+    for row in &registers {
+        println!("{}", row.join(""));
+    }
 }
 
 fn get_cycles() -> Vec<String> {
